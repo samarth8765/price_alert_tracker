@@ -4,6 +4,7 @@ import { database } from './database/database.js';
 import { router } from './routes/alertroutes.js';
 import { authentication } from './middleware/auth.js';
 import { router as authRoute } from './routes/registerRoutes.js';
+import './socket/priceTracker.js'
 
 const app = express();
 const PORT = process.env.PORT || 8080;
