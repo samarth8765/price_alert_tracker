@@ -9,6 +9,14 @@ export const Alert = database.define('Alert', {
         primaryKey: true,
         allowNull: false,
     },
+    userId: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        references: {
+            model: 'Users',
+            key: 'id',
+        }
+    },
     targetPrice: {
         type: DataTypes.FLOAT,
         allowNull: false,
@@ -23,5 +31,5 @@ export const Alert = database.define('Alert', {
     },
 });
 
-Alert.belongsTo(User);
-User.hasMany(Alert);
+Alert.belongsTo(User, { foreignKey: 'userId' });
+User.hasMany(Alert, { foreignKey: 'userId' });
