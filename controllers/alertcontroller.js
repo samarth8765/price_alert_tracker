@@ -1,16 +1,19 @@
+import { getCurrentPrice } from "../helper/currentPrice.js";
 import { Alert } from "../models/alert.js";
 
 export const createAlert = async (req, res) => {
     try {
         const { targetPrice, currencyPair } = req.body;
         const userId = req.user.userId;
+        const currentPrice = await getCurrentPrice(currencyPair);
+        const direction = (currentPrice > targetPrice) ? "below" : "above";
         const alert = await Alert.create({
             userId: userId,
             targetPrice,
             currencyPair,
             status: 'active',
+            direction
         });
-
         res.status(201).json(alert);
     }
     catch (err) {
