@@ -1,5 +1,7 @@
 import { getCurrentPrice } from "../helper/currentPrice.js";
 import { Alert } from "../models/alert.js";
+import Redis from 'ioredis';
+const redis = new Redis();
 
 export const createAlert = async (req, res) => {
     try {
@@ -48,17 +50,25 @@ export const getAllAlerts = async (req, res) => {
     try {
         const userId = req.user.userId;
         const { status } = req.query;
-        const whereClause = { userId };
+        const cacheKey = `alerts:${userId}:${status || 'all'}`;
 
+        const cachedData = await redis.get(cacheKey);
+        if (cachedData) {
+            return res.status(200).json(JSON.parse(cachedData));
+        }
+
+        const whereClause = { userId };
         if (status) whereClause.status = status;
 
         const alerts = await Alert.findAll({
             where: whereClause
         });
 
-        res.json(alerts);
+        await redis.set(cacheKey, JSON.stringify(alerts), 'EX', 60);
+
+        res.status(200).json(alerts);
     } catch (error) {
-        console.log(err.message);
+        console.log(error.message);
         res.status(500).send("Internal server error");
     }
 }
