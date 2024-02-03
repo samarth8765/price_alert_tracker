@@ -21,7 +21,7 @@ export const Alert = database.define('Alert', {
         type: DataTypes.FLOAT,
         allowNull: false,
     },
-    currency: {
+    currencyPair: {
         type: DataTypes.STRING,
         allowNull: false,
     },

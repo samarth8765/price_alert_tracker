@@ -2,13 +2,13 @@ import { Alert } from "../models/alert.js";
 
 export const createAlert = async (req, res) => {
     try {
-        const { targetPrice, currency } = req.body;
+        const { targetPrice, currencyPair } = req.body;
         const userId = req.user.userId;
         const alert = await Alert.create({
             userId: userId,
             targetPrice,
-            currency,
-            status: 'created',
+            currencyPair,
+            status: 'active',
         });
 
         res.status(201).json(alert);
