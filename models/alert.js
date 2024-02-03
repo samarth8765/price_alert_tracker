@@ -29,6 +29,10 @@ export const Alert = database.define('Alert', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    direction: {
+        type: DataTypes.STRING,
+        allowNull: false
+    }
 });
 
 Alert.belongsTo(User, { foreignKey: 'userId' });
