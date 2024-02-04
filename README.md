@@ -15,9 +15,9 @@
 - **Unix/Linux/MacOS:**
   Open your terminal and run the following command in the project root directory:
 
-      ```bash
-      cp .env.example .env
-      ```
+  ```sh
+    cp .env.example .env
+  ```
 
 - **Windows:**
 
