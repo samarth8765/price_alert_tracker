@@ -1,0 +1,57 @@
+version: '3'
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_DB: ${DBNAME}
+      POSTGRES_USER: ${USERNAME}
+      POSTGRES_PASSWORD: ${PASSWORD}
+    networks:
+      - mynetwork
+    ports:
+      - "5432:5432"
+  
+  redis:
+    image: redis
+    networks:
+      - mynetwork
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - mynetwork
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  app:
+    build:  
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    environment:
+      PORT: ${PORT}
+      DBNAME: ${DBNAME}
+      USERNAME: ${USERNAME}
+      PASSWORD: ${PASSWORD}
+      JWT_TOKEN: ${JWT_TOKEN}
+      DB_HOST: postgres
+      RABBITMQ_URL: amqp://rabbitmq
+      EMAIL: ${EMAIL}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      EMAIL_HOST: ${EMAIL_HOST}
+    networks:
+      - mynetwork
+    ports:
+      - "${PORT}:${PORT}"
+
+networks:
+  mynetwork:
