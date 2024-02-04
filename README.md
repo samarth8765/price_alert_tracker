@@ -1,54 +1,74 @@
-# Price Tracker
+# Price Alert App
 
-## Prerequisites Installation
+- This application enables users to monitor cryptocurrency prices in real-time and receive notifications when specific price targets are reached. Users can register, log in, create price alerts, and manage these alerts through a REST API. The application leverages WebSockets for real-time price updates, Redis for caching, and RabbitMQ for managing email notifications.
 
-Before running the application, you need to ensure that Redis, RabbitMQ, and PostgreSQL are running. Here are the commands to run each service using Docker:
+## 🛠️ Local development
 
-### Redis
+### Step 1: Creating a New `.env` File
 
-```bash
-docker run --name my-redis -p 6379:6379 -d redis
-```
+- The project includes a template `.env.example` file that lists all the necessary environment variables without their actual values. You'll need to create a new `.env` file based on this template and fill in the values specific to your setup.
 
-### RabbitMQ
+### Instructions:
 
-```bash
-docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
-```
+1. **Copy the `.env.example` file to create a `.env` file:**
 
-### PostgreSQL
+- **Unix/Linux/MacOS:**
+  Open your terminal and run the following command in the project root directory:
 
-```bash
-docker run --name mypostgres -e POSTGRES_USER=myuser -e POSTGRES_PASSWORD=mypassword -e POSTGRES_DB=mydb -p 5432:5432 -d postgres
-```
+      ```bash
+      cp .env.example .env
+      ```
 
-## Install Dependencies
+- **Windows:**
 
-- Open a terminal and navigate to the root directory of your application. Run the following command to install all necessary dependencies as defined in your package.json file:
+  Open Command Prompt and execute:
 
-```bash
-npm install
-```
+  ```cmd
+  copy .env.example .env
+  ```
 
-## Start the Application
+2. **Fill in the `.env` file with your specific values:**
 
-```bash
-npm run dev
-```
+## Step 2: Understanding the Environment Variables
 
-## Run the Consumer Service
+Here's an explanation of common environment variables you might encounter:
 
-- To start the consumer service that listens to the RabbitMQ message queue and handles email notifications, you'll run it as a separate process. Open a new terminal window or tab, navigate to your project's root directory, and run:
+- `DB_HOST`: The hostname or IP address of your database server.
+- `DBNAME`: The name of the database your application will use.
+- `USERNAME`: The username for database access.
+- `PASSWORD`: The password for database access.
+- `PORT`: The port number your application will run on.
+- `JWT_TOKEN`: A secret key used for signing JWT tokens.
+- `EMAIL`: Your email or notification service login.
+- `EMAIL_PASSWORD`: Your email or notification service password.
+- `EMAIL_HOST`: The SMTP server address for your email service.
+- `EMAIL_PORT`: The SMTP server PORT for your email service.
 
-```bash
-node ./message_queue/consumer.js
-```
+## Step 3: Running the Application
 
-## Application Overview
+### Building Docker Images
 
-This application enables users to monitor cryptocurrency prices in real-time and receive notifications when specific price targets are reached. Users can register, log in, create price alerts, and manage these alerts through a REST API. The application leverages WebSockets for real-time price updates, Redis for caching, and RabbitMQ for managing email notifications.
+1. Open a terminal and navigate to your project's root directory.
+2. Build Docker images with the command:
+   ```sh
+   docker compose build
+   ```
 
-## User Authentication
+### Starting the Application
+
+1. Start the Application by running the command:
+
+   ```sh
+   docker compose up
+   ```
+
+2. Use -d to run in detached mode:
+
+   ```sh
+   docker compose up -d
+   ```
+
+## API ENDPOINTS
 
 ### Register
 
@@ -77,8 +97,13 @@ This application enables users to monitor cryptocurrency prices in real-time and
     ```
   - **Success Response**: `200 OK` with JWT token.
   - **Error Response**: `401 Unauthorized` if credentials are incorrect.
+  <hr>
 
-## Alert Management
+**Before interacting with the endpoints (createAlert, deleteAlert, getAllALerts), ensure you attach the authentication bearer token in the authorization header that is returned in login request. This token is required for authenticating your requests.**
+
+![Alt text](./images/auth.png)
+
+<hr>
 
 ### Create Alert
 
@@ -94,21 +119,22 @@ This application enables users to monitor cryptocurrency prices in real-time and
   - **Success Response**: `201 Created`
   - **Error Response**: `400 Bad Request` if the input is invalid.
 
-### Get All Alerts + Filter
-
-- **GET** `/alert` or '/alert?status=active | triggered'
-  - **Description**: Fetches all alerts for the logged-in user, with optional filtering.
-  - **Query Parameters**:
-    - `currency` (optional): Filter alerts by currency.
-  - **Success Response**: `200 OK` with a list of alerts.
-  - **Error Response**: `500 Internal Server Error` if an error occurs.
-
 ### Delete Alert
 
 - **DELETE** `/alert/delete/:id`
   - **Description**: Deletes a specific alert by its ID.
   - **Success Response**: `200 OK`
   - **Error Response**: `404 Not Found` if the alert ID does not exist.
+
+### Get All Alerts + Filter
+
+- **GET** `/alert` or '/alert?status=active | triggered'
+- **NOTE: In the status query parameter, you can pass either active or triggered to filter the alerts based on their status. If no status is passed, all alerts are returned.**
+  - **Description**: Fetches all alerts for the logged-in user, with optional filtering.
+  - **Query Parameters**:
+    - `currency` (optional): Filter alerts by currency.
+  - **Success Response**: `200 OK` with a list of alerts.
+  - **Error Response**: `500 Internal Server Error` if an error occurs
 
 ## Real-Time Price Monitoring with WebSockets
 
@@ -117,6 +143,8 @@ The application uses WebSockets to subscribe to a cryptocurrency price feed, all
 ## Email Notification via Nodemailer and RabbitMQ
 
 When an alert condition is met, the application sends a message to a RabbitMQ queue, indicating that an email notification should be sent. A separate worker service listens on this queue, extracts email notification tasks, and uses Nodemailer to send the emails. This decouples the email sending process from the main application logic, improving scalability and reliability.
+
+![Alt text](./images/email.png)
 
 ## Using Redis for Caching
 
