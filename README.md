@@ -125,7 +125,3 @@ Redis is utilized to cache frequently accessed data, such as active alerts or re
 ## Summary
 
 This documentation outlines the key functionalities of your application, emphasizing user management, alert operations, real-time data handling with WebSockets, and asynchronous email notifications via RabbitMQ. The use of Redis for caching enhances the application's performance and efficiency.
-
-docker run --name my-redis -p 6379:6379 -d redis
-docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
-docker run --name mypostgres -e POSTGRES_USER=myuser -e POSTGRES_PASSWORD=mypassword -e POSTGRES_DB=mydb -p 5432:5432 -d postgres
