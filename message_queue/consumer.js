@@ -1,10 +1,10 @@
 import { connect } from 'amqplib';
 import { createTransport } from 'nodemailer';
 import 'dotenv/config';
-
+console.log(parseInt(process.env.EMAIL_PORT));
 const transporter = createTransport({
     host: process.env.EMAIL_HOST,
-    port: 587,
+    port: parseInt(process.env.EMAIL_PORT),
     auth: {
         user: process.env.EMAIL,
         pass: process.env.EMAIL_PASSWORD,
