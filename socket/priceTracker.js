@@ -1,5 +1,7 @@
 import WebSocket from 'ws';
 import { Alert } from '../models/alert.js'
+import { publishEmailTask } from '../message_queue/producer.js';
+import { User } from '../models/user.js';
 
 const alertsSubscriptions = new Map();
 
@@ -60,7 +62,14 @@ async function checkAndNotifyAlerts(symbol, currentPrice) {
             alert.status = 'triggered';
             await alert.save();
             console.log("Price has changed", symbol, alert.id);
-            // sendEmailNotification(alert);
+
+            const user = await User.findOne({ where: { id: alert.userId } });
+            const emailData = {
+                to: user.email,
+                subject: `Alert Triggered for ${symbol}`,
+                body: `Your alert for ${symbol} at price ${alert.targetPrice} has been triggered. Current price: ${currentPrice}.`
+            };
+            await publishEmailTask(emailData);
         }
     });
 }
