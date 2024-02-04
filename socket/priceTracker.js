@@ -74,5 +74,7 @@ async function checkAndNotifyAlerts(symbol, currentPrice) {
     });
 }
 
-refreshSubscriptions();
-setInterval(refreshSubscriptions, 120000); 
+export async function startWebSocketSubscriptions() {
+    await refreshSubscriptions();
+    setInterval(refreshSubscriptions, 60000);
+}
