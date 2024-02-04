@@ -1,12 +1,13 @@
 import { connect } from 'amqplib';
 import { createTransport } from 'nodemailer';
+import 'dotenv/config';
 
 const transporter = createTransport({
-    host: 'smtp.ethereal.email',
+    host: process.env.EMAIL_HOST,
     port: 587,
     auth: {
-        user: process.env.TRANSPORTER_HOST,
-        pass: process.env.TRANSPORTER_PASSWORD,
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASSWORD,
     }
 });
 
@@ -17,7 +18,7 @@ async function sendEmail(emailData) {
     }
     const { to, subject, body } = emailData;
     await transporter.sendMail({
-        from: `"Name" ${process.env.TRANSPORTER_HOST}`,
+        from: `${process.env.EMAIL}`,
         to: to,
         subject: subject,
         text: body,
@@ -26,9 +27,9 @@ async function sendEmail(emailData) {
     console.log(`Email sent to ${to}`);
 }
 
-async function startEmailConsumer() {
+export async function startEmailConsumer() {
     try {
-        const conn = await connect('amqp://localhost');
+        const conn = await connect('amqp://rabbitmq');
         const channel = await conn.createChannel();
 
         const queue = 'emailTasks';
@@ -52,5 +53,5 @@ async function startEmailConsumer() {
     }
 }
 
-startEmailConsumer();
+
 
