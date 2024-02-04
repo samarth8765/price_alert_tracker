@@ -1,7 +1,7 @@
 import { getCurrentPrice } from "../helper/currentPrice.js";
 import { Alert } from "../models/alert.js";
 import Redis from 'ioredis';
-const redis = new Redis();
+const redis = new Redis({ host: 'redis' });
 
 export const createAlert = async (req, res) => {
     try {
@@ -35,7 +35,7 @@ export const deleteAlert = async (req, res) => {
             })
         }
         else {
-            res.json(403), json({
+            res.json(403).json({
                 message: "Invalid alert id"
             })
         }
