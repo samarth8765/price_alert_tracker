@@ -5,8 +5,8 @@ const transporter = createTransport({
     host: 'smtp.ethereal.email',
     port: 587,
     auth: {
-        user: 'michel.hane@ethereal.email',
-        pass: 'rH2X4R2pxyWMNdV6PQ'
+        user: process.env.TRANSPORTER_HOST,
+        pass: process.env.TRANSPORTER_PASSWORD,
     }
 });
 
@@ -17,7 +17,7 @@ async function sendEmail(emailData) {
     }
     const { to, subject, body } = emailData;
     await transporter.sendMail({
-        from: '"Michel" <michel.hane@ethereal.email>',
+        from: `"Name" ${process.env.TRANSPORTER_HOST}`,
         to: to,
         subject: subject,
         text: body,
