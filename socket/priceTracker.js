@@ -26,8 +26,10 @@ function subscribeToCurrencyPair(pair) {
 
 function closeAllConnections() {
     alertsSubscriptions.forEach((ws, pair) => {
-        console.log(`Closing connection for ${pair}`);
-        ws.close();
+        if (ws.readyState === WebSocket.OPEN) {
+            console.log(`Closing connection for ${pair}`);
+            ws.close();
+        }
         alertsSubscriptions.delete(pair);
     });
 }
