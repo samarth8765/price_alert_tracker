@@ -16,7 +16,12 @@ export const createAlert = async (req, res) => {
             status: 'active',
             direction
         });
-        res.status(201).json(alert);
+
+        // Invalidate the cache for status=active and status=all for this user
+        await redis.del(`alerts:${userId}:active`);
+        await redis.del(`alerts:${userId}:all`);
+
+        return res.status(201).json(alert);
     }
     catch (err) {
         console.log(err);
@@ -27,15 +32,19 @@ export const createAlert = async (req, res) => {
 export const deleteAlert = async (req, res) => {
     try {
         const id = req.params.id;
-        const alert = await Alert.destroy({ where: { id } });
+        const alert = await Alert.findOne({ where: { id } });
+        const deleteAlert = await Alert.destroy({ where: { id } });
 
-        if (alert) {
-            res.status(200).json({
+        if (deleteAlert) {
+            // Invalidate the cache for status=active and status=all for this user
+            await redis.del(`alerts:${alert.userId}:${alert.status}`);
+            await redis.del(`alerts:${alert.userId}:all`);
+            return res.status(200).json({
                 message: "Alert Deleted",
             })
         }
         else {
-            res.json(403).json({
+            return res.status(403).json({
                 message: "Invalid alert id"
             })
         }
@@ -50,8 +59,15 @@ export const getAllAlerts = async (req, res) => {
     try {
         const userId = req.user.userId;
         const { status } = req.query;
-        const cacheKey = `alerts:${userId}:${status || 'all'}`;
+        if (status !== 'active' && status !== 'triggered') {
+            if (status) {
+                return res.status(400).json({
+                    message: "Invalid status",
+                })
+            }
+        }
 
+        const cacheKey = `alerts:${userId}:${status || 'all'}`;
         const cachedData = await redis.get(cacheKey);
         if (cachedData) {
             return res.status(200).json(JSON.parse(cachedData));
