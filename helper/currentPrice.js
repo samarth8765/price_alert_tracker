@@ -10,3 +10,4 @@ export async function getCurrentPrice(symbol = 'BTCUSDT') {
         console.error('Error fetching current price:', error);
     }
 }
+// getCurrentPrice().then((ans) => console.log(ans));
