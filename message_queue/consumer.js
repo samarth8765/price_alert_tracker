@@ -29,7 +29,7 @@ async function sendEmail(emailData) {
 
 export async function startEmailConsumer() {
     try {
-        const conn = await connect('amqp://rabbitmq');
+        const conn = await connect(process.env.RABBITMQ_URL);
         const channel = await conn.createChannel();
 
         const queue = 'emailTasks';

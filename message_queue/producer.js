@@ -1,7 +1,7 @@
 import { connect } from 'amqplib';
 
 export async function publishEmailTask(emailData) {
-    const conn = await connect('amqp://rabbitmq');
+    const conn = await connect(process.env.RABBITMQ_URL);
     const channel = await conn.createChannel();
     const queue = 'emailTasks';
 
