@@ -121,7 +121,7 @@ Here's an explanation of common environment variables you might encounter:
 
 ### Delete Alert
 
-- **DELETE** `/alert/delete/:id`
+- **DELETE** `/alert/:id`
   - **Description**: Deletes a specific alert by its ID.
   - **Success Response**: `200 OK`
   - **Error Response**: `404 Not Found` if the alert ID does not exist.
